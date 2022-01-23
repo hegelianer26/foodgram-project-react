@@ -10,7 +10,8 @@ from rest_framework import filters
 
 from .serializers import (
     TagSerializer, IngredientSerializer,
-    RecipeSerializer, RecipeSimpleSerializer)
+    RecipeSerializer, ShoppingCartSerializer)
+from users.serializers import FavoritedSerializer
 from .models import (
     Shopping_Cart, Tag, Ingredient,
     Recipe, Ingridients_For_Recipe, Favorited)
@@ -59,11 +60,13 @@ class RecipesViewSet(viewsets.ModelViewSet):
             ).exists():
                 data = {'detail': 'Рецепт уже в избранном!'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                Favorited.objects.create(user=request.user, recipe=recipe)
-                serializer = RecipeSimpleSerializer(recipe)
-                return Response(
-                    data=serializer.data, status=status.HTTP_201_CREATED)
+
+            instance = Favorited.objects.create(
+                recipe=recipe, user=request.user
+            )
+            serializer = FavoritedSerializer(instance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         elif request.method == 'DELETE':
             if Favorited.objects.filter(
                     user=request.user, recipe=recipe
@@ -87,11 +90,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 data = {'detail': 'Уже в списке покупок!'}
                 return Response(
                     data=data, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                Shopping_Cart.objects.create(user=request.user, recipe=recipe)
-                serializer = RecipeSimpleSerializer(recipe)
-                return Response(
-                    data=serializer.data, status=status.HTTP_201_CREATED)
+            instance = Shopping_Cart.objects.create(
+                user=request.user, recipe=recipe)
+            serializer = ShoppingCartSerializer(instance)
+            return Response(
+                data=serializer.data, status=status.HTTP_201_CREATED)
+
         elif request.method == 'DELETE':
             if Shopping_Cart.objects.filter(
                     user=request.user, recipe=recipe
@@ -109,7 +113,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request, pk=None):
         user = request.user
         queryset = Ingridients_For_Recipe.objects.filter(
-            recipe__favorited_by__user=user)
+            recipe__shopping_cart__user=user)
         shopping_list = {}
         for ingredient in queryset:
             amount = ingredient.amount
@@ -133,6 +137,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
             final_data += (f'{words} \n')
 
         response = HttpResponse(
-            final_data, content_type='application/text; charset=UTF-8')
-        response['Content-Disposition'] = 'attachment; filename=shopping'
+            final_data, content_type='text/plain; charset=UTF-8')
+        response['Content-Disposition'] = 'attachment; filename="shopping.txt"'
         return response

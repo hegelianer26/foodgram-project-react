@@ -102,14 +102,14 @@ class Recipe(models.Model):
             )],
         verbose_name='Время приготовления',
         help_text='Время приготовления в минутах.')
-    is_favorited = models.BooleanField(
-        default=False,
-        verbose_name='В избранном'
-        )
-    in_shopping_cart = models.BooleanField(
-        default=False,
-        verbose_name='В списке покупок'
-        )
+    # is_favorited = models.BooleanField(
+    #     default=False,
+    #     verbose_name='В избранном'
+    #     )
+    # in_shopping_cart = models.BooleanField(
+    #     default=False,
+    #     verbose_name='В списке покупок'
+    #     )
     pub_date = models.DateTimeField(
         verbose_name='Дата добавления',
         auto_now_add=True
@@ -124,6 +124,7 @@ class Recipe(models.Model):
 
 
 class Ingridients_For_Recipe(models.Model):
+
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
@@ -158,6 +159,7 @@ class Tags_For_Recipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
+        related_name='slugs',
         on_delete=models.CASCADE)
     tags = models.ForeignKey(
         Tag,

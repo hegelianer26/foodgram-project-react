@@ -2,6 +2,7 @@ from rest_framework import serializers
 from djoser.serializers import (
     UserCreateSerializer as BaseUserRegistrationSerializer)
 from django.core.paginator import Paginator
+from drf_extra_fields.fields import Base64ImageField
 
 from .models import Follow, CustomUser
 from recipe.models import Favorited, Recipe
@@ -32,21 +33,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class FavoritedSerializer(serializers.ModelSerializer):
-
-    def validate(self, data):
-        user = self.context['request'].user
-        id = self.context['view'].kwargs.get('recipe_id')
-        if Favorited.objects.filter(id=id, user=user).exists():
-            raise serializers.ValidationError('Рецепт уже в избранном')
-        return data
-
-    def create(self, validated_data):
-        favorite = Favorited.objects.create(**validated_data)
-        favorite.save()
-        return favorite
+    id = serializers.ReadOnlyField(source="recipe.id")
+    name = serializers.ReadOnlyField(source="recipe.name")
+    image = Base64ImageField(source="recipe.image", read_only=True)
+    cooking_time = serializers.ReadOnlyField(source="recipe.cooking_time")
 
     class Meta:
-        model = Recipe
+        model = Favorited
         fields = ('id', 'name', 'image', 'cooking_time', )
 
 
@@ -84,10 +77,14 @@ class FollowUserSerializer(serializers.ModelSerializer):
         queryset = Recipe.objects.filter(author=obj.author)
         paginator = Paginator(queryset, recipes_limit)
         recep = paginator.page(1)
-        return FavoritedSerializer(recep, many=True).data
+        return FollowSerializer(recep, many=True).data
 
 
 class FollowSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField()
+    image = Base64ImageField(read_only=True)
+    cooking_time = serializers.ReadOnlyField()
+
     class Meta:
-        model = Follow
-        fields = ('user', 'author', )
+        fields = ("id", "name", "image", "cooking_time")
+        model = Recipe

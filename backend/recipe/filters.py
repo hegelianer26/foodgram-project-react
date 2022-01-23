@@ -4,21 +4,34 @@ from .models import Recipe, Tag
 
 
 class Recipefilter(django_filters.FilterSet):
-    # default for CharFilter is to have exact lookup_type
-    # name = django_filters.CharFilter(lookup_type='icontains')
-    # description = django_filters.CharFilter(lookup_type='icontains')
 
-    # tricky part - how to filter by related field?
-    # but not by its foreign key (default)
-    # `to_field_name` is crucial here
-    # `conjoined=True` makes that, the more tags, the more narrow the search
     tags = django_filters.ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(),
         field_name='tags__slug',
         to_field_name='slug',
         conjoined=True,
     )
+    is_favorited = django_filters.NumberFilter(
+        field_name='is_favorited', 
+        method='filter_is_favorited'
+        )
+    in_shopping_cart = django_filters.NumberFilter(
+        field_name='is_favorited', 
+        method='filter_in_shopping_cart'
+        )
 
     class Meta:
         model = Recipe
-        fields = ['tags']
+        fields = ['tags', 'is_favorited', 'in_shopping_cart']
+
+    def filter_is_favorited(self, qs, name, value):
+
+        if value == 1:
+            return qs.filter(favorited_by__user=self.request.user)
+        return qs
+
+    def filter_in_shopping_cart(self, qs, name, value):
+
+        if value == 1:
+            return qs.filter(in_shopping_cart=True)
+        return qs
