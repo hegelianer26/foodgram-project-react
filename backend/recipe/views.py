@@ -29,11 +29,12 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().order_by('-pub_date')
     pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = RecipeSerializer

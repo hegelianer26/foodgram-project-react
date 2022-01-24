@@ -5,11 +5,8 @@ from .models import Recipe, Tag
 
 class Recipefilter(django_filters.FilterSet):
 
-    tags = django_filters.ModelMultipleChoiceFilter(
-        queryset=Tag.objects.all(),
+    tags = django_filters.AllValuesMultipleFilter(
         field_name='tags__slug',
-        to_field_name='slug',
-        conjoined=True,
     )
     is_favorited = django_filters.NumberFilter(
         field_name='is_favorited', 
