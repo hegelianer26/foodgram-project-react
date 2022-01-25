@@ -6,9 +6,10 @@ with open("ingrs.csv", encoding='utf-8') as f:
     for row in reader:
         try:
             _, created = Ingredient.objects.get_or_create(
-            name=row[0],
-            measurement_unit=row[1],
-            )
+                name=row[0],
+                measurement_unit=row[1],
+                )
         except (ObjectDoesNotExist, MultipleObjectsReturned):
-            event = Ingredient.objects.filter(name=row[0], measurement_unit=row[1]).order_by('id').first()
+            event = Ingredient.objects.filter(
+                name=row[0], measurement_unit=row[1]).order_by('id').first()
             pass

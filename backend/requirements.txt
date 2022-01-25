@@ -10,7 +10,7 @@ coreschema==0.0.4
 cryptography==36.0.1
 csvImporter==0.1.3.2
 defusedxml==0.7.1
-Django==4.0
+Django
 django-adaptors==0.2.5
 django-colorfield==0.6.3
 django-csvimport==2.16
@@ -36,13 +36,11 @@ messytables==0.15.2
 mypdf==1.0
 oauthlib==3.1.1
 Pillow==9.0.0
-psycopg2==2.9.3
+psycopg2
 pycparser==2.21
 PyJWT==2.3.0
 python-dateutil==2.8.2
 python-dotenv==0.19.2
-python-magic==0.4.24
-python-magic-bin==0.4.14
 python3-openid==3.2.0
 pytz==2021.3
 reportlab==3.6.5
@@ -57,3 +55,5 @@ uritemplate==4.1.1
 urllib3==1.26.7
 webencodings==0.5.1
 xlrd==2.0.1
+gunicorn==20.0.4 
+psycopg2-binary==2.8.6 
