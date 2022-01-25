@@ -134,8 +134,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
         pdfmetrics.registerFont(TTFont('Times', 'times.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
+        filename = "shopping-list.pdf"
         response['Content-Disposition'] = (
-            'attachment; filename="shopping_list.pdf"')
+            'attachment; filename="{}"'.format(filename))
         p = canvas.Canvas(response)
         p.setFont('Times', size=16)
         i = 0
