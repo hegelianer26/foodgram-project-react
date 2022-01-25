@@ -1,3 +1,4 @@
+from drf_writable_nested import serializers
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,7 +6,7 @@ from djoser.serializers import SetPasswordSerializer
 
 from .models import CustomUser, Follow
 from .serializers import (
-    CustomUserSerializer, FollowUserSerializer, UserRegistrationSerializer)
+    CustomUserSerializer, FollowSerializer, FollowUserSerializer, UserRegistrationSerializer)
 from .pagintations import CustomPagination
 from .permissions import OwnOrReadOrRegister
 
@@ -63,7 +64,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             elif author == user:
                 data = {'detail': 'Нелья подписываться на самого себя!'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            Follow.objects.get_or_create(user=user, author=author)
+            instance = Follow.objects.get_or_create(user=user, author=author)
             return Response(status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             Follow.objects.filter(user=user, author=author).delete()
