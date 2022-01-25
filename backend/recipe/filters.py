@@ -1,6 +1,15 @@
 import django_filters
 
-from .models import Recipe, Tag
+from .models import Recipe, Ingredient
+
+
+class IngredientsFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(
+        field_name='name', lookup_expr='istartswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
 
 
 class Recipefilter(django_filters.FilterSet):
@@ -8,12 +17,15 @@ class Recipefilter(django_filters.FilterSet):
     tags = django_filters.AllValuesMultipleFilter(
         field_name='tags__slug',
     )
+    author = django_filters.AllValuesMultipleFilter(
+        field_name='author__id',
+    )
     is_favorited = django_filters.NumberFilter(
-        field_name='is_favorited', 
+        field_name='is_favorited',
         method='filter_is_favorited'
         )
     in_shopping_cart = django_filters.NumberFilter(
-        field_name='is_favorited', 
+        field_name='is_favorited',
         method='filter_in_shopping_cart'
         )
 

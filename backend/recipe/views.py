@@ -7,6 +7,10 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from users.pagintations import CustomPagination
 from rest_framework import filters
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 
 from .serializers import (
     TagSerializer, IngredientSerializer,
@@ -16,7 +20,7 @@ from .models import (
     Shopping_Cart, Tag, Ingredient,
     Recipe, Ingridients_For_Recipe, Favorited)
 from .permissions import AuthorOrReadOnly
-from .filters import Recipefilter
+from .filters import Recipefilter, IngredientsFilter
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -29,12 +33,12 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = IngredientsFilter
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all().order_by('-pub_date')
+    queryset = Recipe.objects.all()
     pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = RecipeSerializer
@@ -42,7 +46,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = Recipefilter
     pagination_class = CustomPagination
-    ordering_fields = ('pub_date', )
+    ordering_fields = ('-pub_date', )
 
     def perform_create(self, serializer):
         serializer.save(
@@ -110,7 +114,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=['get'], detail=False,
-        permission_classes=[IsAuthenticated])
+        permission_classes=[IsAuthenticated],
+        )
     def download_shopping_cart(self, request, pk=None):
         user = request.user
         queryset = Ingridients_For_Recipe.objects.filter(
@@ -126,18 +131,22 @@ class RecipesViewSet(viewsets.ModelViewSet):
                     'amount': amount}
             else:
                 shopping_list[name]['amount'] += amount
-        data = []
+
+        pdfmetrics.registerFont(TTFont('Times', 'times.ttf', 'UTF-8'))
+        response = HttpResponse(content_type='application/pdf')
+        response[
+            'Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
+        p = canvas.Canvas(response)
+        p.setFont('Times', size=16)
         i = 0
+        location = 800
         for item, value in shopping_list.items():
             i += 1
-            data.append(
-                (f'{i}) { item } ({value["measurement_unit"]}) -'
-                 f' {value["amount"]} '))
-        final_data = ''
-        for words in data:
-            final_data += (f'{words} \n')
+            location -= 30
+            p.drawString(
+                70, location, (f'{i}) { item } - {value["amount"]}'
+                 f'{value["measurement_unit"]}'))
 
-        response = HttpResponse(
-            final_data, content_type='text/plain; charset=UTF-8')
-        response['Content-Disposition'] = 'attachment; filename="shopping.txt"'
+        p.showPage()
+        p.save()
         return response

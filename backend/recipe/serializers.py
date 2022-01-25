@@ -73,6 +73,26 @@ class RecipeSerializer(WritableNestedModelSerializer):
         fields = (
             'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
+            
+    def validate_ingredients(self, data):
+        ingredients = []
+        for ingredient in data:
+            if ingredient['id'] in ingredients:
+                raise serializers.ValidationError(
+                    'Ингридиенты не должны повторяться')
+            ingredients.append(ingredient['id'])
+
+            if int(ingredient['amount']) <= 0:
+                raise serializers.ValidationError(
+                    'Количество ингридиента должно быть больше 0')
+
+        return data
+    
+    def validate_cooking_time(self, data):
+        if int(data) <= 0:
+            raise serializers.ValidationError(
+                'Время приготовления должно быть больше 0')
+        return data
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
@@ -102,7 +122,6 @@ class RecipeSerializer(WritableNestedModelSerializer):
         tags_data = validated_data.pop('tags')
         updated_recipe = super().update(instance, validated_data)
         updated_recipe.tags.clear()
-        # updated_recipe.tags.set(tags_data)
         tags = []
         for tag in tags_data:
             tag_object = get_object_or_404(Tag, id=tag.id)
