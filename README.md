@@ -4,7 +4,9 @@
 
 ## Доступно по:
 URL - http://51.250.18.118/
+
 login - review@review.com
+
 pass - reviewer670821
 
 ## Инструкция по запуску проекта на удаленном сервере Ubuntu
@@ -20,13 +22,13 @@ sudo curl -L &quot;https://github.com/docker/compose/releases/download/1.29.2/do
 compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose
 ```
 
-3) Cкопировать файлы docker-compose.yml и nginx.conf из директории infra
+3) Cкопировать файлы docker-compose.yml и nginx.conf из директории infra. В nginx.conf добавить адрес Вашего сервера.
+
 ```
 sudo scp docker-compose.yml &lt;username&gt;@&lt;host&gt;:/home/&lt;username&gt;/docker-compose.yml
 sudo scp nginx.conf &lt;username&gt;@&lt;host&gt;:/home/&lt;username&gt;/nginx.conf
 ```
 
-В nginx.conf добавить адрес Вашего сервера.
 
 4) Cоздать и отредактировать файл .env
 ```
@@ -47,11 +49,6 @@ sudo nano .env
 ```
 sudo docker-compose up -d --build
 ```
-    Проект запуститься в четырёх контейнерах:
-        nginx:1.19.3
-        postgres:12.4
-        foodgram_backend
-        foodgram_frontend
 
 6) Применить миграцию, собрать статику и создать суперпользователя:
 ```
@@ -63,14 +60,19 @@ sudo docker-compose exec backend python manage.py createsuperuser
 Проект будет доступен по IP сервера
 
 ## Основные технологии
-```
+
 Python
+
 Django
+
 PostgreSQL
+
 Docker
+
 NGINX
+
 GitHub
-```
+
 
 ## Автор
 Артём Васильев
