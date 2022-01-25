@@ -1,4 +1,3 @@
-from drf_writable_nested import serializers
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,7 +5,7 @@ from djoser.serializers import SetPasswordSerializer
 
 from .models import CustomUser, Follow
 from .serializers import (
-    CustomUserSerializer, FollowSerializer,
+    CustomUserSerializer,
     FollowUserSerializer, UserRegistrationSerializer)
 from .pagintations import CustomPagination
 from .permissions import OwnOrReadOrRegister
