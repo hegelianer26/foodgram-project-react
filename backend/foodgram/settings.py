@@ -8,7 +8,7 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SECRET_KEY = os.getenv('SECRET_KEY_DJANGO')
+SECRET_KEY = os.getenv('SECRET_KEY_DJANGO', default='uc0@(!eut5x*lw-lm)n+pau0*czlet3s$0@0z*ec&x-h9znqk6')
 
 
 DEBUG = True
