@@ -54,6 +54,6 @@ jobs:
         # Пуш образа в Docker Hub 
         uses: docker/build-push-action@v2 
         with:
-          file: backend/Dockerfile
+          context: ./backend/
           push: true
           tags: hegelianer/foodgram:v1  
