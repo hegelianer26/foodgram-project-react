@@ -6,7 +6,8 @@ from djoser.serializers import SetPasswordSerializer
 
 from .models import CustomUser, Follow
 from .serializers import (
-    CustomUserSerializer, FollowSerializer, FollowUserSerializer, UserRegistrationSerializer)
+    CustomUserSerializer, FollowSerializer,
+    FollowUserSerializer, UserRegistrationSerializer)
 from .pagintations import CustomPagination
 from .permissions import OwnOrReadOrRegister
 
@@ -64,7 +65,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             elif author == user:
                 data = {'detail': 'Нелья подписываться на самого себя!'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            instance = Follow.objects.get_or_create(user=user, author=author)
             return Response(status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             Follow.objects.filter(user=user, author=author).delete()

@@ -73,7 +73,7 @@ class RecipeSerializer(WritableNestedModelSerializer):
         fields = (
             'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
-            
+
     def validate_ingredients(self, data):
         ingredients = []
         for ingredient in data:
@@ -87,7 +87,7 @@ class RecipeSerializer(WritableNestedModelSerializer):
                     'Количество ингридиента должно быть больше 0')
 
         return data
-    
+
     def validate_cooking_time(self, data):
         if int(data) <= 0:
             raise serializers.ValidationError(
